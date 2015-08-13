@@ -521,8 +521,7 @@ angular.module('ui.bootstrap.modal', [])
       options: {
         animation: true,
         backdrop: true, //can also be false or 'static'
-        keyboard: true,
-        appendTo: 'body'
+        keyboard: true
       },
       $get: ['$injector', '$rootScope', '$q', '$templateRequest', '$controller', '$modalStack',
         function ($injector, $rootScope, $q, $templateRequest, $controller, $modalStack) {
@@ -623,7 +622,7 @@ angular.module('ui.bootstrap.modal', [])
                 windowTemplateUrl: modalOptions.windowTemplateUrl,
                 size: modalOptions.size,
                 openedClass: modalOptions.openedClass,
-                appendTo: modalOptions.appendTo
+                appendTo: modalOptions.appendTo || 'body'
               });
 
             }, function resolveError(reason) {
