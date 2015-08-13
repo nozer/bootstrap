@@ -265,22 +265,22 @@ angular.module('ui.bootstrap.modal', [])
 
       function removeModalWindow(modalInstance, elementToReceiveFocus) {
 
-        var body = $document.find('body').eq(0);
         var modalWindow = openedWindows.get(modalInstance).value;
+        var modalContainer = angular.element($document[0].querySelector(modalWindow.appendTo)).eq(0);
 
         //clean up the stack
         openedWindows.remove(modalInstance);
 
         removeAfterAnimate(modalWindow.modalDomEl, modalWindow.modalScope, function() {
-          body.toggleClass(modalWindow.openedClass || OPENED_MODAL_CLASS, openedWindows.length() > 0);
+          modalContainer.toggleClass(modalWindow.openedClass || OPENED_MODAL_CLASS, openedWindows.length() > 0);
         });
         checkRemoveBackdrop();
 
-        //move focus to specified element if available, or else to body
+        //move focus to specified element if available, or else to modalContainer
         if (elementToReceiveFocus && elementToReceiveFocus.focus) {
           elementToReceiveFocus.focus();
         } else {
-          body.focus();
+          modalContainer.focus();
         }
       }
 
@@ -385,10 +385,11 @@ angular.module('ui.bootstrap.modal', [])
           modalScope: modal.scope,
           backdrop: modal.backdrop,
           keyboard: modal.keyboard,
-          openedClass: modal.openedClass
+          openedClass: modal.openedClass,
+          appendTo: modal.appendTo
         });
 
-        var body = $document.find('body').eq(0),
+        var modalContainer = angular.element($document[0].querySelector(modal.appendTo)).eq(0),
             currBackdropIndex = backdropIndex();
 
         if (currBackdropIndex >= 0 && !backdropDomEl) {
@@ -400,7 +401,7 @@ angular.module('ui.bootstrap.modal', [])
             angularBackgroundDomEl.attr('modal-animation', 'true');
           }
           backdropDomEl = $compile(angularBackgroundDomEl)(backdropScope);
-          body.append(backdropDomEl);
+          modalContainer.append(backdropDomEl);
         }
 
         var angularDomEl = angular.element('<div modal-window="modal-window"></div>');
@@ -418,8 +419,8 @@ angular.module('ui.bootstrap.modal', [])
         var modalDomEl = $compile(angularDomEl)(modal.scope);
         openedWindows.top().value.modalDomEl = modalDomEl;
         openedWindows.top().value.modalOpener = modalOpener;
-        body.append(modalDomEl);
-        body.addClass(modal.openedClass || OPENED_MODAL_CLASS);
+        modalContainer.append(modalDomEl);
+        modalContainer.addClass(modal.openedClass || OPENED_MODAL_CLASS);
         $modalStack.clearFocusListCache();
       };
 
@@ -520,7 +521,8 @@ angular.module('ui.bootstrap.modal', [])
       options: {
         animation: true,
         backdrop: true, //can also be false or 'static'
-        keyboard: true
+        keyboard: true,
+        appendTo: 'body'
       },
       $get: ['$injector', '$rootScope', '$q', '$templateRequest', '$controller', '$modalStack',
         function ($injector, $rootScope, $q, $templateRequest, $controller, $modalStack) {
@@ -620,7 +622,8 @@ angular.module('ui.bootstrap.modal', [])
                 windowClass: modalOptions.windowClass,
                 windowTemplateUrl: modalOptions.windowTemplateUrl,
                 size: modalOptions.size,
-                openedClass: modalOptions.openedClass
+                openedClass: modalOptions.openedClass,
+                appendTo: modalOptions.appendTo
               });
 
             }, function resolveError(reason) {
